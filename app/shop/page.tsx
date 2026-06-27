@@ -1,5 +1,5 @@
 import { products } from "../../data/products";
-import ShopClient from "components/shop/ShopClient";
+import ShopClient from "../../components/shop/ShopClient";
 
 export default function ShopPage() {
   return (

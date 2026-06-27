@@ -14,8 +14,8 @@ export default function Loader() {
 
   return (
     <div className="loader">
-      <h1>803 TAKEOVER</h1>
-      <p>DROP 001</p>
-    </div>
+  <h1>803 TAKEOVER</h1>
+  <p>THE TAKEOVER NEVER ENDS</p>
+</div>
   );
 }
