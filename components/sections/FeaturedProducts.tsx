@@ -1,19 +1,24 @@
-import { products } from "../../data/products";
 import ProductCard from "../product/ProductCard";
+import { getStoreProducts } from "../../lib/products";
 
-export default function FeaturedProducts() {
-  const featuredProducts = products.filter((product) => product.featured);
+export const dynamic = "force-dynamic";
+
+export default async function FeaturedProducts() {
+  const products = await getStoreProducts({ featuredOnly: true });
+
+  if (products.length === 0) return null;
 
   return (
-    <section className="featured" id="featured">
-      <div className="section-header">
+    <section className="featured-v2">
+      <div className="featured-v2-header">
         <span>DROP 001</span>
-        <h2>LONG LIVE FELIX</h2>
+        <h2>FEATURED PIECES</h2>
+        <p>LIMITED RELEASE<br />DESIGNED TO BE FLY</p>
       </div>
 
-      <div className="featured-grid">
-        {featuredProducts.map((product) => (
-          <ProductCard product={product} key={product.slug} />
+      <div className="featured-v2-grid">
+        {products.slice(0, 3).map((product) => (
+          <ProductCard key={product.slug} product={product} />
         ))}
       </div>
     </section>

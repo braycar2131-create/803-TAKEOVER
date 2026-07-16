@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "../../types/product";
@@ -9,17 +7,16 @@ type ProductCardProps = {
   onQuickView?: () => void;
 };
 
-export default function ProductCard({
-  product,
-  onQuickView,
-}: ProductCardProps) {
+export default function ProductCard({ product, onQuickView }: ProductCardProps) {
   const frontImage = product.images[0];
   const backImage = product.images[1] || product.images[0];
 
   return (
-    <article className="product-card">
+    <article className="product-card product-card-v2">
       <Link href={`/shop/${product.slug}`} className="product-card-link">
         <div className="product-image">
+          <div className="product-card-glow"></div>
+
           <Image
             className="product-front"
             src={frontImage}
@@ -45,7 +42,7 @@ export default function ProductCard({
         </div>
       </Link>
 
-      {onQuickView && (
+      {onQuickView ? (
         <button
           className="quick-view-button"
           type="button"
@@ -53,6 +50,10 @@ export default function ProductCard({
         >
           QUICK VIEW
         </button>
+      ) : (
+        <Link href={`/shop/${product.slug}`} className="quick-view-button">
+          VIEW PRODUCT
+        </Link>
       )}
     </article>
   );

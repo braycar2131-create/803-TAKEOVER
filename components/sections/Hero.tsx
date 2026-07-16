@@ -1,54 +1,69 @@
 import Link from "next/link";
-import Image from "next/image";
+import ThreeDCrown from "../hero/ThreeDCrown";
 
-const heroProducts = [
-  {
-    label: "BLACK",
-    image: "/products/drop001/black/front.png",
-  },
-  {
-    label: "WHITE",
-    image: "/products/drop001/white/front.png",
-  },
-  {
-    label: "RED",
-    image: "/products/drop001/red/front.png",
-  },
-];
+const stars = Array.from({ length: 32 }, (_, index) => index + 1);
+const crosses = Array.from({ length: 12 }, (_, index) => index + 1);
 
 export default function Hero() {
   return (
-    <section className="hero-v4" id="home">
-      <div className="hero-v4-glow" />
+    <section className="cinematic-hero">
+      <div className="hero-noise"></div>
+      <div className="hero-red-glow"></div>
+      <div className="logo-flare"></div>
 
-      <div className="hero-v4-content">
-        <span>803 TAKEOVER PRESENTS</span>
+      <div className="flare-stars">
+        {stars.map((star) => (
+          <span className={`flare-star star-${star}`} key={star}></span>
+        ))}
+      </div>
+
+      <div className="floating-crosses">
+        {crosses.map((cross) => (
+          <span className={`neon-cross cross-${cross}`} key={cross}>
+            ✝
+          </span>
+        ))}
+      </div>
+
+      <div className="smoke-layer smoke-left"></div>
+      <div className="smoke-layer smoke-right"></div>
+      <div className="smoke-layer smoke-bottom"></div>
+
+      <div className="cloud-smoke">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div className="cinematic-content">
+        <ThreeDCrown />
+
+        <p className="cinematic-eyebrow">
+          803 TAKEOVER PRESENTS
+        </p>
 
         <h1>
-          DROP 001 <br />
-          LONG LIVE FELIX
+          803 <br />
+          <span>TAKEOVER</span>
         </h1>
 
-        <p>THE CITY WATCHING. THE MOVEMENT GROWING.</p>
+        <p className="cinematic-tagline">
+          THE CITY WATCHING.
+          <br />
+          THE MOVEMENT GROWING.
+        </p>
 
-        <div className="hero-v4-products">
-          {heroProducts.map((product) => (
-            <div className="hero-v4-card" key={product.label}>
-              <Image
-                src={product.image}
-                alt={`${product.label} Felix Tee`}
-                width={700}
-                height={700}
-                priority
-              />
-              <small>{product.label}</small>
-            </div>
-          ))}
-        </div>
-
-        <Link className="hero-v4-button" href="/shop">
-          SHOP THE DROP
+        <Link href="/shop" className="cinematic-button">
+          SHOP NOW
         </Link>
+      </div>
+
+      <div className="scroll-cue">
+        <span>SCROLL DOWN</span>
+        <div></div>
       </div>
     </section>
   );

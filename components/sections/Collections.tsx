@@ -1,3 +1,30 @@
+import Image from "next/image";
+import Link from "next/link";
+
+const collections = [
+  {
+    number: "01",
+    title: "BLACK FELIX TEE",
+    text: "Dark base. Red pressure.",
+    href: "/products/black-felix-tee",
+    image: "/products/drop001/black/front.png",
+  },
+  {
+    number: "02",
+    title: "WHITE FELIX TEE",
+    text: "Clean base. Loud graphic.",
+    href: "/products/white-felix-tee",
+    image: "/products/drop001/white/front.png",
+  },
+  {
+    number: "03",
+    title: "RED FELIX TEE",
+    text: "Statement piece. Full takeover.",
+    href: "/products/red-felix-tee",
+    image: "/products/drop001/red/front.png",
+  },
+];
+
 export default function Collections() {
   return (
     <section className="collections" id="collections">
@@ -7,15 +34,26 @@ export default function Collections() {
       </div>
 
       <div className="collection-grid">
-        <a className="collection-card black-card" href="/shop/black-felix-tee">
-          <div className="collection-content"><span>01</span><h3>BLACK</h3><p>Dark base. Red pressure.</p></div>
-        </a>
-        <a className="collection-card white-card" href="/shop/white-felix-tee">
-          <div className="collection-content"><span>02</span><h3>WHITE</h3><p>Clean base. Loud graphic.</p></div>
-        </a>
-        <a className="collection-card red-card" href="/shop/red-felix-tee">
-          <div className="collection-content"><span>03</span><h3>RED</h3><p>Statement piece. Full takeover.</p></div>
-        </a>
+        {collections.map((item) => (
+          <Link className="collection-card" href={item.href} key={item.title}>
+            <div className="collection-number">{item.number}</div>
+
+            <div className="collection-image">
+              <Image
+                src={item.image}
+                alt={item.title}
+                width={900}
+                height={900}
+              />
+            </div>
+
+            <div className="collection-content">
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+              <span>VIEW PRODUCT</span>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );

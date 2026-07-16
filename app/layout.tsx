@@ -1,28 +1,22 @@
 import "./globals.css";
-
-import Navbar from "../components/layout/Navbar";
-import CartDrawer from "../components/cart/CartDrawer";
-import CustomCursor from "../components/ui/CustomCursor";
-import MouseGlow from "../components/effects/MouseGlow";
-import SmoothScroll from "../components/effects/SmoothScroll";
-import ScrollProgress from "../components/ui/ScrollProgress";
 import { CartProvider } from "../context/CartContext";
+import CartDrawer from "../components/cart/CartDrawer";
 
 export const metadata = {
-  title: "803 Takeover",
-  description: "Drop 001 — Long Live Felix",
+  title: "803 TAKEOVER",
+  description:
+    "Luxury streetwear. The city watching. The movement growing.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body>
         <CartProvider>
-          <ScrollProgress />
-          <SmoothScroll />
-          <MouseGlow />
-          <CustomCursor />
-          <Navbar />
           {children}
           <CartDrawer />
         </CartProvider>

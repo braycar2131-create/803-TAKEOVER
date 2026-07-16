@@ -1,0 +1,14 @@
+model AudienceSubscriber {
+  id            String   @id @default(cuid())
+  email         String?  @unique
+  phone         String?  @unique
+  emailConsent  Boolean  @default(false)
+  smsConsent    Boolean  @default(false)
+  consentText   String?
+  consentSource String   @default("entry-gate")
+  userAgent     String?
+  joinedAt      DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([joinedAt])
+}

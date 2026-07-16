@@ -12,7 +12,14 @@ export const products: Product[] = [
     color: "BLACK",
     image: "/products/drop001/black/front.png",
     images: ["/products/drop001/black/front.png", "/products/drop001/black/back.png"],
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
+
+inventory: [
+  { size: "S", quantity: 10 },
+  { size: "M", quantity: 10 },
+  { size: "L", quantity: 10 },
+  { size: "XL", quantity: 10 },
+],
     description:
       "The black colorway from DROP 001 — LONG LIVE FELIX. Heavy streetwear energy with bold 803 graphics, red star details, and full back artwork.",
     featured: true,
@@ -28,7 +35,14 @@ export const products: Product[] = [
     color: "WHITE",
     image: "/products/drop001/white/front.png",
     images: ["/products/drop001/white/front.png", "/products/drop001/white/back.png"],
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
+
+inventory: [
+  { size: "S", quantity: 10 },
+  { size: "M", quantity: 10 },
+  { size: "L", quantity: 10 },
+  { size: "XL", quantity: 10 },
+],
     description:
       "The white colorway from DROP 001 — LONG LIVE FELIX. Clean white tee with black and red graphics built around the 803 TAKEOVER identity.",
     featured: true,
@@ -44,7 +58,13 @@ export const products: Product[] = [
     color: "RED",
     image: "/products/drop001/red/front.png",
     images: ["/products/drop001/red/front.png", "/products/drop001/red/back.png"],
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL"],
+    inventory: [
+  { size: "S", quantity: 10 },
+  { size: "M", quantity: 10 },
+  { size: "L", quantity: 10 },
+  { size: "XL", quantity: 10 },
+],
     description:
       "The red colorway from DROP 001 — LONG LIVE FELIX. Loud red base with white 803 graphics, black star details, and full cinematic back print.",
     featured: true,

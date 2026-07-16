@@ -1,0 +1,49 @@
+-- CreateTable
+CREATE TABLE "Order" (
+    "id" TEXT NOT NULL,
+    "stripeSessionId" TEXT NOT NULL,
+    "stripePaymentIntentId" TEXT,
+    "customerEmail" TEXT,
+    "customerName" TEXT,
+    "customerPhone" TEXT,
+    "amountSubtotal" INTEGER NOT NULL,
+    "amountTotal" INTEGER NOT NULL,
+    "currency" TEXT NOT NULL,
+    "paymentStatus" TEXT NOT NULL,
+    "orderStatus" TEXT NOT NULL DEFAULT 'PAID',
+    "shippingName" TEXT,
+    "shippingLine1" TEXT,
+    "shippingLine2" TEXT,
+    "shippingCity" TEXT,
+    "shippingState" TEXT,
+    "shippingPostalCode" TEXT,
+    "shippingCountry" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderItem" (
+    "id" TEXT NOT NULL,
+    "orderId" TEXT NOT NULL,
+    "productSlug" TEXT NOT NULL,
+    "productName" TEXT NOT NULL,
+    "size" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "unitAmount" INTEGER NOT NULL,
+    "lineTotal" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Order_stripeSessionId_key" ON "Order"("stripeSessionId");
+
+-- CreateIndex
+CREATE INDEX "OrderItem_orderId_idx" ON "OrderItem"("orderId");
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
