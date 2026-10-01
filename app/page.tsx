@@ -1,29 +1,38 @@
+import Navbar from "../components/layout/Navbar";
+
 import Loader from "../components/ui/Loader";
+import ScrollProgress from "../components/ui/ScrollProgress";
+import CustomCursor from "../components/ui/CustomCursor";
+
+import MouseGlow from "../components/effects/MouseGlow";
+import SmoothScroll from "../components/effects/SmoothScroll";
+
 import Hero from "../components/sections/Hero";
-import Collections from "../components/sections/Collections";
 import FeaturedProducts from "../components/sections/FeaturedProducts";
+import BrandStatement from "../components/sections/BrandStatement";
 import Campaign from "../components/sections/Campaign";
-import Lookbook from "../components/sections/Lookbook";
 import BrandStory from "../components/sections/BrandStory";
-import SocialFeed from "../components/sections/SocialFeed";
 import Newsletter from "../components/sections/Newsletter";
 import Footer from "../components/sections/Footer";
 
 export default function Home() {
   return (
-    <>
+    <main className="home-page">
+      <SmoothScroll />
+      <ScrollProgress />
+      <CustomCursor />
+      <MouseGlow />
       <Loader />
-      <main>
-        <Hero />
-        <Collections />
-        <FeaturedProducts />
-        <Campaign />
-        <Lookbook />
-        <BrandStory />
-        <SocialFeed />
-        <Newsletter />
-      </main>
+
+      <Navbar />
+
+      <Hero />
+      <FeaturedProducts />
+      <BrandStatement />
+      <Campaign />
+      <BrandStory />
+      <Newsletter />
       <Footer />
-    </>
+    </main>
   );
 }

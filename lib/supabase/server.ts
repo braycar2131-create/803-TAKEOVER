@@ -1,23 +1,38 @@
-import { createServerClient } from "@supabase/ssr";
+﻿import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
+function getSupabaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (!url) {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL is missing."
+    );
+  }
+
+  return url;
+}
+
+function getSupabasePublicKey(): string {
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!key) {
+    throw new Error(
+      "Supabase public key is missing."
+    );
+  }
+
+  return key;
+}
 
 export async function createClient() {
   const cookieStore = await cookies();
 
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required."
-    );
-  }
-
   return createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
+    getSupabaseUrl(),
+    getSupabasePublicKey(),
     {
       cookies: {
         getAll() {
@@ -38,7 +53,7 @@ export async function createClient() {
           } catch {
             /*
              * Server Components cannot always write cookies.
-             * The root proxy refreshes the session when needed.
+             * The root proxy refreshes the browser cookies.
              */
           }
         },
@@ -46,3 +61,4 @@ export async function createClient() {
     }
   );
 }
+

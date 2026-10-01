@@ -5,8 +5,7 @@ import "./admin.css";
 
 export const metadata: Metadata = {
   title: "803 TAKEOVER Admin",
-  description:
-    "803 TAKEOVER store management dashboard",
+  description: "803 TAKEOVER store management dashboard",
 };
 
 export default function AdminLayout({
@@ -20,10 +19,7 @@ export default function AdminLayout({
 
       <div className="admin-main">
         <Topbar />
-
-        <main className="admin-content">
-          {children}
-        </main>
+        <div className="admin-content">{children}</div>
       </div>
     </div>
   );

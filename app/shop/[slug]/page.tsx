@@ -1,78 +1,181 @@
-import { products } from "../../../data/products";
-import ProductActions from "../../../components/product/ProductActions";
+import Link from "next/link";
+
+import { notFound } from "next/navigation";
+import Navbar from "../../../components/layout/Navbar";
 import ProductGallery from "../../../components/product/ProductGallery";
-import ProductCard from "../../../components/product/ProductCard";
+import ProductActions from "../../../components/product/ProductActions";
+import FeaturedProducts from "../../../components/sections/FeaturedProducts";
+import Footer from "../../../components/sections/Footer";
+import { getStoreProductBySlug } from "../../../lib/products";
+
+export const dynamic = "force-dynamic";
 
 type ProductPageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 };
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({
+  params,
+}: ProductPageProps) {
   const { slug } = await params;
+  const product = await getStoreProductBySlug(slug);
 
-  const product = products.find((item) => item.slug === slug);
-
-  if (!product) {
-    return (
-      <main className="product-page">
-        <section className="product-detail">
-          <div className="product-detail-info">
-            <span>803 TAKEOVER</span>
-            <h1>PRODUCT NOT FOUND</h1>
-
-            <a className="back-shop" href="/shop">
-              BACK TO SHOP
-            </a>
-          </div>
-        </section>
-      </main>
-    );
+  if (!product || product.active === false) {
+    notFound();
   }
 
-  const relatedProducts = products.filter((item) => item.slug !== product.slug);
+  const oversizedSlugs = [
+    "803-oversized-hoodie",
+    "803-oversized-longsleeve",
+    "803-oversized-tee",
+  ];
+
+  const isOversized = product.slug.includes("oversized");
+
+  const displayLabel = isOversized
+    ? "OVERSIZED"
+    : product.tag;
+
+  const displayFit = isOversized
+    ? "OVERSIZED"
+    : "RELAXED";
+
+  const displayCategory =
+  product.slug.includes("longsleeve")
+    ? "LONG SLEEVE"
+    : product.category;
+
+  const descriptionBySlug: Record<string, string> = {
+    "803-oversized-hoodie":
+      "An oversized 803 TAKEOVER hoodie built around a bold streetwear silhouette and everyday wearability.",
+
+    "803-oversized-longsleeve":
+      "An oversized 803 TAKEOVER long sleeve designed with a loose streetwear silhouette and statement graphics.",
+
+    "803-oversized-tee":
+      "An oversized 803 TAKEOVER tee designed with a roomy streetwear silhouette and a strong graphic presence.",
+  };
+
+  const displayDescription =
+    descriptionBySlug[product.slug] ??
+    product.description;
 
   return (
     <main className="product-page">
-      <section className="product-detail">
-        <ProductGallery images={product.images} name={product.name} />
+      <Navbar />
 
-        <div className="product-detail-info">
-          <span>{product.tag}</span>
+      <section className="product-detail product-detail-v2">
+        <div className="product-breadcrumb">
+          <Link href="/">HOME</Link>
+          <span>/</span>
 
-          <h1>{product.name}</h1>
+          <Link href="/shop">
+            SHOP
+          </Link>
 
-          <p className="product-detail-price">{product.displayPrice}</p>
+          <span>/</span>
 
-          <p className="product-detail-copy">{product.description}</p>
+          <strong>
+            {product.name}
+          </strong>
+        </div>
 
-          <div className="product-meta">
-            <p>COLOR: {product.color}</p>
-            <p>CATEGORY: {product.category}</p>
-            <p>DROP: LONG LIVE FELIX</p>
+        <ProductGallery
+          images={product.images}
+          name={product.name}
+        />
+
+        <div className="product-detail-info product-detail-info-v2">
+          <span>{displayLabel}</span>
+
+          <h1>
+            {product.name}
+          </h1>
+
+          <p className="product-detail-price">
+            {product.displayPrice}
+          </p>
+
+          <p className="product-detail-copy">
+            {displayDescription}
+          </p>
+
+          <div className="product-meta product-meta-grid">
+            <div>
+              <span>COLOR</span>
+              <strong>
+                {product.color}
+              </strong>
+            </div>
+
+            <div>
+              <span>COLLECTION</span>
+              <strong>
+                {product.tag}
+              </strong>
+            </div>
+
+            <div>
+              <span>CATEGORY</span>
+              <strong>
+                {displayCategory}
+              </strong>
+            </div>
+
+            <div>
+              <span>FIT</span>
+              <strong>
+                {displayFit}
+              </strong>
+            </div>
+
+            <div>
+              <span>FABRIC</span>
+              <strong>
+                PREMIUM COTTON
+              </strong>
+            </div>
+
+            <div>
+              <span>BRAND</span>
+              <strong>
+                803 TAKEOVER
+              </strong>
+            </div>
           </div>
 
           <ProductActions product={product} />
 
-          <a className="back-shop" href="/shop">
-            BACK TO SHOP
-          </a>
+          <Link
+            className="back-shop"
+            href="/shop"
+          >
+            ← BACK TO SHOP
+          </Link>
         </div>
       </section>
 
-      <section className="related-products">
-        <div className="section-header">
-          <span>COMPLETE THE DROP</span>
-          <h2>RELATED PIECES</h2>
-        </div>
+      <section className="product-story">
+        <span>
+          803 TAKEOVER — LONG LIVE FELIX COLLECTIVE
+        </span>
 
-        <div className="featured-grid">
-          {relatedProducts.map((item) => (
-            <ProductCard product={item} key={item.slug} />
-          ))}
-        </div>
+        <h2>
+          BUILT TO
+          <br />
+          TAKEOVER
+        </h2>
+
+        <p>
+          Premium streetwear created for the movement.
+          Every piece is released in limited quantities
+          and built around the 803 TAKEOVER identity.
+        </p>
       </section>
+
+      <FeaturedProducts />
+
+      <Footer />
     </main>
   );
 }

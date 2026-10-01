@@ -70,7 +70,7 @@ export default function ShopClient({ products }: ShopClientProps) {
         <div className="shop-catalog-heading">
           <div>
             <span>THE COLLECTION</span>
-            <h2>SHOP DROP 001</h2>
+            <h2>SHOP THE COLLECTIVE</h2>
           </div>
 
           <div className="shop-catalog-stats">
@@ -80,8 +80,8 @@ export default function ShopClient({ products }: ShopClientProps) {
             </div>
 
             <div>
-              <strong>001</strong>
-              <span>LIMITED DROP</span>
+              <strong>LLF</strong>
+              <span>LIMITED COLLECTIVE</span>
             </div>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function ShopClient({ products }: ShopClientProps) {
             SHOWING {filteredProducts.length} OF {products.length}
           </span>
 
-          <span>803 TAKEOVER — DROP 001</span>
+          <span>803 TAKEOVER — LONG LIVE FELIX COLLECTIVE</span>
         </div>
 
         <section className="shop-products">

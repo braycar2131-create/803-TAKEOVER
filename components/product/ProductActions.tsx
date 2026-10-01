@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import type { Product } from "../../types/product";
 
@@ -11,32 +11,15 @@ type ProductActionsProps = {
 export default function ProductActions({
   product,
 }: ProductActionsProps) {
-  const firstAvailableSize =
-    product.inventory.find((item) => item.quantity > 0)?.size ?? "";
-
-  const [selectedSize, setSelectedSize] = useState(firstAvailableSize);
+  const [selectedSize, setSelectedSize] = useState(
+    product.sizes[0] ?? ""
+  );
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   const { addItem } = useCart();
 
-  const selectedInventory = useMemo(
-    () =>
-      product.inventory.find(
-        (item) => item.size === selectedSize
-      ),
-    [product.inventory, selectedSize]
-  );
-
-  const availableQuantity = selectedInventory?.quantity ?? 0;
-  const soldOut = availableQuantity <= 0;
   const total = product.price * quantity;
-
-  useEffect(() => {
-    setQuantity((current) =>
-      Math.min(Math.max(1, current), Math.max(1, availableQuantity))
-    );
-  }, [availableQuantity]);
 
   useEffect(() => {
     if (!added) return;
@@ -53,13 +36,11 @@ export default function ProductActions({
   }
 
   function increaseQuantity() {
-    setQuantity((current) =>
-      Math.min(Math.max(1, availableQuantity), current + 1)
-    );
+    setQuantity((current) => current + 1);
   }
 
   function handleAddToCart() {
-    if (!selectedSize || soldOut) return;
+    if (!selectedSize) return;
 
     addItem({
       slug: product.slug,
@@ -79,7 +60,7 @@ export default function ProductActions({
       <div className="product-option-heading">
         <div>
           <span>SELECT SIZE</span>
-          <strong>{selectedSize || "SOLD OUT"}</strong>
+          <strong>{selectedSize}</strong>
         </div>
 
         <button type="button" className="size-guide-button">
@@ -91,40 +72,21 @@ export default function ProductActions({
         className="product-detail-sizes"
         aria-label="Select product size"
       >
-        {product.inventory.map((item) => {
-          const unavailable = item.quantity <= 0;
-
-          return (
-            <button
-              key={item.size}
-              type="button"
-              className={[
-                "size-button",
-                selectedSize === item.size ? "active-size" : "",
-                unavailable ? "sold-out-size" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={() => {
-                if (!unavailable) {
-                  setSelectedSize(item.size);
-                  setQuantity(1);
-                }
-              }}
-              aria-pressed={selectedSize === item.size}
-              disabled={unavailable}
-            >
-              {item.size}
-              <small>
-                {unavailable
-                  ? "SOLD OUT"
-                  : item.quantity <= 3
-                    ? `${item.quantity} LEFT`
-                    : `${item.quantity} IN STOCK`}
-              </small>
-            </button>
-          );
-        })}
+        {product.sizes.map((size) => (
+          <button
+            key={size}
+            type="button"
+            className={
+              selectedSize === size
+                ? "size-button active-size"
+                : "size-button"
+            }
+            onClick={() => setSelectedSize(size)}
+            aria-pressed={selectedSize === size}
+          >
+            {size}
+          </button>
+        ))}
       </div>
 
       <div className="product-quantity-section">
@@ -135,7 +97,6 @@ export default function ProductActions({
             type="button"
             onClick={decreaseQuantity}
             aria-label="Decrease quantity"
-            disabled={soldOut}
           >
             −
           </button>
@@ -146,17 +107,10 @@ export default function ProductActions({
             type="button"
             onClick={increaseQuantity}
             aria-label="Increase quantity"
-            disabled={soldOut || quantity >= availableQuantity}
           >
             +
           </button>
         </div>
-
-        {!soldOut && availableQuantity <= 3 ? (
-          <p className="product-low-stock">
-            ONLY {availableQuantity} LEFT IN {selectedSize}
-          </p>
-        ) : null}
       </div>
 
       <div className="product-total-row">
@@ -172,13 +126,11 @@ export default function ProductActions({
         }
         type="button"
         onClick={handleAddToCart}
-        disabled={!selectedSize || soldOut}
+        disabled={!selectedSize}
       >
-        {soldOut
-          ? "SOLD OUT"
-          : added
-            ? "ADDED TO CART"
-            : `ADD ${selectedSize} TO CART`}
+        {added
+          ? "ADDED TO CART"
+          : `ADD ${selectedSize} TO CART`}
       </button>
 
       <div className="product-purchase-benefits">
@@ -193,8 +145,8 @@ export default function ProductActions({
         </div>
 
         <div>
-          <strong>LIVE INVENTORY</strong>
-          <span>Availability updates after paid orders</span>
+          <strong>PREMIUM QUALITY</strong>
+          <span>Built to represent the 803</span>
         </div>
       </div>
     </div>

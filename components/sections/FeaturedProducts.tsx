@@ -11,7 +11,7 @@ export default async function FeaturedProducts() {
   return (
     <section className="featured-v2">
       <div className="featured-v2-header">
-        <span>DROP 001</span>
+        <span>LONG LIVE FELIX COLLECTIVE</span>
         <h2>FEATURED PIECES</h2>
         <p>LIMITED RELEASE<br />DESIGNED TO BE FLY</p>
       </div>

@@ -6,7 +6,7 @@ export default function FeaturedReveal() {
     <section className="featured-reveal">
 
       <div className="featured-reveal-bg">
-        DROP 001
+        LONG LIVE FELIX COLLECTIVE
       </div>
 
       <div className="featured-reveal-image">

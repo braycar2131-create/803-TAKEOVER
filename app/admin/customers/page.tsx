@@ -1,14 +1,16 @@
-import Link from "next/link";
 import { prisma } from "../../../lib/prisma";
+import { formatAdminDate, formatMoney } from "../../../lib/admin";
 
 export const dynamic = "force-dynamic";
 
-function formatMoney(cents: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(cents / 100);
-}
+type CustomerSummary = {
+  email: string;
+  name: string;
+  phone: string;
+  orderCount: number;
+  totalSpent: number;
+  lastOrderAt: Date;
+};
 
 export default async function AdminCustomersPage() {
   const orders = await prisma.order.findMany({
@@ -16,90 +18,66 @@ export default async function AdminCustomersPage() {
       customerEmail: {
         not: null,
       },
-
-      paymentStatus: "paid",
     },
-
     select: {
-      id: true,
       customerEmail: true,
       customerName: true,
+      shippingName: true,
       customerPhone: true,
       amountTotal: true,
+      currency: true,
       createdAt: true,
-      items: {
-        select: {
-          size: true,
-          quantity: true,
-        },
-      },
     },
-
     orderBy: {
       createdAt: "desc",
     },
   });
 
-  const customerMap = new Map<
-    string,
-    {
-      email: string;
-      name: string | null;
-      phone: string | null;
-      orders: number;
-      totalSpent: number;
-      lastOrder: Date;
-      sizes: Map<string, number>;
-    }
-  >();
+  const customerMap = new Map<string, CustomerSummary>();
 
   for (const order of orders) {
-    if (!order.customerEmail) continue;
+    const email = order.customerEmail?.trim().toLowerCase();
 
-    const email = order.customerEmail.toLowerCase();
+    if (!email) continue;
 
-    const existing = customerMap.get(email) ?? {
+    const existing = customerMap.get(email);
+
+    if (existing) {
+      existing.orderCount += 1;
+      existing.totalSpent += order.amountTotal;
+
+      if (order.createdAt > existing.lastOrderAt) {
+        existing.lastOrderAt = order.createdAt;
+        existing.name =
+          order.customerName ||
+          order.shippingName ||
+          existing.name;
+        existing.phone =
+          order.customerPhone ||
+          existing.phone;
+      }
+
+      continue;
+    }
+
+    customerMap.set(email, {
       email,
-      name: order.customerName,
-      phone: order.customerPhone,
-      orders: 0,
-      totalSpent: 0,
-      lastOrder: order.createdAt,
-      sizes: new Map<string, number>(),
-    };
-
-    existing.orders += 1;
-    existing.totalSpent += order.amountTotal;
-
-    if (order.createdAt > existing.lastOrder) {
-      existing.lastOrder = order.createdAt;
-      existing.name = order.customerName;
-      existing.phone = order.customerPhone;
-    }
-
-    for (const item of order.items) {
-      existing.sizes.set(
-        item.size,
-        (existing.sizes.get(item.size) ?? 0) + item.quantity
-      );
-    }
-
-    customerMap.set(email, existing);
+      name:
+        order.customerName ||
+        order.shippingName ||
+        "Unknown customer",
+      phone:
+        order.customerPhone ||
+        "Not provided",
+      orderCount: 1,
+      totalSpent: order.amountTotal,
+      lastOrderAt: order.createdAt,
+    });
   }
 
-  const customers = Array.from(customerMap.values())
-    .map((customer) => {
-      const favoriteSize =
-        Array.from(customer.sizes.entries()).sort(
-          (a, b) => b[1] - a[1]
-        )[0]?.[0] ?? "—";
-
-      return {
-        ...customer,
-        favoriteSize,
-      };
-    })
-    .sort((a, b) => b.totalSpent - a.totalSpent);
+  const customers = Array.from(customerMap.values()).sort(
+    (a, b) => b.totalSpent - a.totalSpent
+  );
 
   return (
     <>
@@ -107,10 +85,8 @@ export default async function AdminCustomersPage() {
         <div>
           <span>CUSTOMER DATABASE</span>
           <h1>CUSTOMERS</h1>
-
           <p>
-            Review customer spending, order frequency, contact
-            information, and preferred sizes.
+            Every customer with a completed Stripe order appears here.
           </p>
         </div>
 
@@ -120,9 +96,11 @@ export default async function AdminCustomersPage() {
       <section className="admin-panel">
         {customers.length === 0 ? (
           <div className="admin-empty-state">
-            <span>NO CUSTOMERS</span>
-            <h3>NO CUSTOMER DATA YET</h3>
-            <p>Paid orders will automatically appear here.</p>
+            <span>NO DATA</span>
+            <h3>NO CUSTOMERS YET</h3>
+            <p>
+              Customer records will appear after completed orders are saved.
+            </p>
           </div>
         ) : (
           <div className="admin-table-wrap">
@@ -130,12 +108,11 @@ export default async function AdminCustomersPage() {
               <thead>
                 <tr>
                   <th>CUSTOMER</th>
+                  <th>EMAIL</th>
                   <th>PHONE</th>
                   <th>ORDERS</th>
-                  <th>LIFETIME SPEND</th>
-                  <th>FAVORITE SIZE</th>
+                  <th>TOTAL SPENT</th>
                   <th>LAST ORDER</th>
-                  <th />
                 </tr>
               </thead>
 
@@ -143,32 +120,14 @@ export default async function AdminCustomersPage() {
                 {customers.map((customer) => (
                   <tr key={customer.email}>
                     <td>
-                      <strong>
-                        {customer.name || "CUSTOMER"}
-                      </strong>
-
-                      <small>{customer.email}</small>
+                      <strong>{customer.name}</strong>
                     </td>
 
-                    <td>{customer.phone || "—"}</td>
-                    <td>{customer.orders}</td>
+                    <td>{customer.email}</td>
+                    <td>{customer.phone}</td>
+                    <td>{customer.orderCount}</td>
                     <td>{formatMoney(customer.totalSpent)}</td>
-                    <td>{customer.favoriteSize}</td>
-
-                    <td>
-                      {customer.lastOrder.toLocaleDateString()}
-                    </td>
-
-                    <td>
-                      <Link
-                        className="admin-table-link"
-                        href={`/admin/orders?q=${encodeURIComponent(
-                          customer.email
-                        )}`}
-                      >
-                        ORDERS
-                      </Link>
-                    </td>
+                    <td>{formatAdminDate(customer.lastOrderAt)}</td>
                   </tr>
                 ))}
               </tbody>

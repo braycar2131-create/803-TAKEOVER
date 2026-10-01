@@ -19,11 +19,6 @@ model Order {
   currency              String
   paymentStatus         String
   orderStatus           String      @default("PAID")
-  trackingNumber        String?
-  shippingCarrier       String?
-  packedAt              DateTime?
-  shippedAt             DateTime?
-  deliveredAt           DateTime?
   shippingName          String?
   shippingLine1         String?
   shippingLine2         String?
@@ -33,6 +28,11 @@ model Order {
   shippingCountry       String?
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
+  deliveredAt           DateTime?
+  packedAt              DateTime?
+  shippedAt             DateTime?
+  shippingCarrier       String?
+  trackingNumber        String?
   items                 OrderItem[]
 }
 
@@ -103,8 +103,8 @@ model ProductInventory {
 
 model AudienceSubscriber {
   id            String   @id @default(cuid())
-  email         String?
-  phone         String?
+  email         String?  @unique
+  phone         String?  @unique
   emailConsent  Boolean  @default(false)
   smsConsent    Boolean  @default(false)
   consentText   String?
@@ -113,7 +113,5 @@ model AudienceSubscriber {
   joinedAt      DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@unique([email])
-  @@unique([phone])
   @@index([joinedAt])
 }

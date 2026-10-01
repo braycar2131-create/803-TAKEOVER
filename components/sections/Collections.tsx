@@ -30,7 +30,7 @@ export default function Collections() {
     <section className="collections" id="collections">
       <div className="section-header">
         <span>COLLECTIONS</span>
-        <h2>EXPLORE DROP 001</h2>
+        <h2>EXPLORE LONG LIVE FELIX COLLECTIVE</h2>
       </div>
 
       <div className="collection-grid">

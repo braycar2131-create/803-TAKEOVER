@@ -15,24 +15,20 @@ const navigation = [
     label: "ORDERS",
   },
   {
-    href: "/admin/products",
-    label: "PRODUCTS",
-  },
-  {
-    href: "/admin/inventory",
-    label: "INVENTORY",
-  },
-  {
-    href: "/admin/media",
-    label: "MEDIA",
-  },
-  {
     href: "/admin/customers",
     label: "CUSTOMERS",
   },
   {
     href: "/admin/analytics",
     label: "ANALYTICS",
+  },
+  {
+    href: "/admin/products",
+    label: "PRODUCTS",
+  },
+  {
+    href: "/admin/inventory",
+    label: "INVENTORY",
   },
   {
     href: "/admin/search",
@@ -46,13 +42,9 @@ const navigation = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] =
-    useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  function isActive(
-    href: string,
-    exact?: boolean
-  ) {
+  function isActive(href: string, exact?: boolean) {
     if (exact) {
       return pathname === href;
     }

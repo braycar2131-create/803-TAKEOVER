@@ -11,16 +11,16 @@ export default function Campaign() {
 
         <h2>
           THE CITY <br />
-          KNOWS.
+          KNOWS
         </h2>
 
         <p>
-          They laughed when we started. Now they watching. DROP 001 is built
+          They laughed when we started. Now they watching. The LONG LIVE FELIX COLLECTIVE is built
           from pressure, loyalty, motion, and takeover energy.
         </p>
 
         <div className="campaign-v2-actions">
-          <Link href="/shop">SHOP DROP 001</Link>
+          <Link href="/shop">SHOP THE COLLECTIVE</Link>
           <Link href="/about" className="secondary">
             THE STORY
           </Link>
@@ -39,7 +39,7 @@ export default function Campaign() {
         />
 
         <div className="campaign-v2-label">
-          <span>DROP 001</span>
+          <span>LONG LIVE FELIX COLLECTIVE</span>
           <strong>LONG LIVE FELIX</strong>
         </div>
       </div>

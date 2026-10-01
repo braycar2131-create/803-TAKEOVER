@@ -1,18 +1,21 @@
 export default function BrandStatement() {
   return (
     <section className="brand-statement">
-      <div className="brand-statement-bg">803</div>
-
       <div className="brand-statement-content">
-        <span>BUILT IN THE 803</span>
+        <span>LUXURY STREETWEAR · EST. MMXXVI</span>
 
         <h2>
-          THE CITY <br />
-          IS WATCHING.
+          BUILT IN THE 803
+          <br />
+          DESIGNED TO
+          <br />
+          <strong>TAKE OVER</strong>
         </h2>
 
         <p>
-          Built for the ones who move first. Never follow. Never fold.
+          Every piece is built with pressure, pride, and purpose.
+          Made for the ones who move differently, stand out naturally,
+          and refuse to follow the crowd.
         </p>
       </div>
     </section>

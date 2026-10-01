@@ -7,13 +7,25 @@ type ProductCardProps = {
   onQuickView?: () => void;
 };
 
-export default function ProductCard({ product, onQuickView }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  onQuickView,
+}: ProductCardProps) {
   const frontImage = product.images[0];
   const backImage = product.images[1] || product.images[0];
 
+  const isOversized = product.slug.includes("oversized");
+
+  const displayLabel = isOversized
+    ? "OVERSIZED"
+    : product.tag;
+
   return (
     <article className="product-card product-card-v2">
-      <Link href={`/shop/${product.slug}`} className="product-card-link">
+      <Link
+        href={`/shop/${product.slug}`}
+        className="product-card-link"
+      >
         <div className="product-image">
           <div className="product-card-glow"></div>
 
@@ -35,9 +47,12 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         </div>
 
         <div className="product-info">
-          <span>{product.tag}</span>
+          <span>{displayLabel}</span>
+
           <h3>{product.name}</h3>
+
           <p>{product.displayPrice}</p>
+
           <small>{product.color}</small>
         </div>
       </Link>
@@ -51,7 +66,10 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           QUICK VIEW
         </button>
       ) : (
-        <Link href={`/shop/${product.slug}`} className="quick-view-button">
+        <Link
+          href={`/shop/${product.slug}`}
+          className="quick-view-button"
+        >
           VIEW PRODUCT
         </Link>
       )}

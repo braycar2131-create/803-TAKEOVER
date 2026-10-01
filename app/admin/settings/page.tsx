@@ -1,40 +1,20 @@
 export default function AdminSettingsPage() {
-  const settings = [
+  const environmentChecks = [
     {
-      label: "ADMIN EMAIL",
-      value: process.env.ADMIN_EMAIL || "NOT CONFIGURED",
+      label: "DATABASE_URL",
+      ready: Boolean(process.env.DATABASE_URL),
     },
     {
-      label: "SITE URL",
-      value:
-        process.env.NEXT_PUBLIC_SITE_URL ||
-        "http://localhost:3000",
+      label: "STRIPE_SECRET_KEY",
+      ready: Boolean(process.env.STRIPE_SECRET_KEY),
     },
     {
-      label: "DATABASE",
-      value: process.env.DATABASE_URL
-        ? "CONNECTED"
-        : "NOT CONFIGURED",
+      label: "STRIPE_WEBHOOK_SECRET",
+      ready: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     },
     {
-      label: "STRIPE",
-      value: process.env.STRIPE_SECRET_KEY
-        ? process.env.STRIPE_SECRET_KEY.startsWith("sk_live_")
-          ? "LIVE MODE"
-          : "TEST MODE"
-        : "NOT CONFIGURED",
-    },
-    {
-      label: "STRIPE WEBHOOK",
-      value: process.env.STRIPE_WEBHOOK_SECRET
-        ? "CONFIGURED"
-        : "NOT CONFIGURED",
-    },
-    {
-      label: "SUPABASE",
-      value: process.env.NEXT_PUBLIC_SUPABASE_URL
-        ? "CONNECTED"
-        : "NOT CONFIGURED",
+      label: "NEXT_PUBLIC_SITE_URL",
+      ready: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
     },
   ];
 
@@ -42,69 +22,91 @@ export default function AdminSettingsPage() {
     <>
       <section className="admin-page-heading">
         <div>
-          <span>STORE CONFIGURATION</span>
+          <span>SYSTEM CONTROL</span>
           <h1>SETTINGS</h1>
-
           <p>
-            Review the current environment and production-service
-            configuration.
+            Environment status and store configuration overview.
           </p>
         </div>
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "16px",
-        }}
-      >
-        {settings.map((setting) => (
-          <article className="admin-panel" key={setting.label}>
-            <span
-              style={{
-                color: "var(--admin-muted)",
-                fontSize: "0.58rem",
-                letterSpacing: "0.18em",
-              }}
-            >
-              {setting.label}
-            </span>
+      <div className="admin-dashboard-grid">
+        <section className="admin-panel">
+          <div className="admin-panel-heading">
+            <div>
+              <span>ENVIRONMENT</span>
+              <h2>SYSTEM STATUS</h2>
+            </div>
+          </div>
 
-            <strong
-              style={{
-                display: "block",
-                marginTop: "14px",
-                overflowWrap: "anywhere",
-              }}
-            >
-              {setting.value}
-            </strong>
-          </article>
-        ))}
-      </section>
+          <dl className="admin-detail-list">
+            {environmentChecks.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>
+                  <span
+                    className={
+                      item.ready
+                        ? "admin-status admin-status--paid"
+                        : "admin-status admin-status--cancelled"
+                    }
+                  >
+                    {item.ready ? "CONNECTED" : "MISSING"}
+                  </span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
 
-      <section
-        className="admin-panel"
-        style={{ marginTop: "22px" }}
-      >
-        <h2>PRODUCTION CHECKLIST</h2>
+        <section className="admin-panel">
+          <div className="admin-panel-heading">
+            <div>
+              <span>STORE PROFILE</span>
+              <h2>803 TAKEOVER</h2>
+            </div>
+          </div>
 
-        <div
-          style={{
-            display: "grid",
-            gap: "12px",
-            marginTop: "20px",
-            color: "var(--admin-muted)",
-          }}
-        >
-          <p>✓ Database URL configured</p>
-          <p>✓ Stripe secret key configured</p>
-          <p>✓ Stripe webhook secret configured</p>
-          <p>✓ Supabase URL and anonymous key configured</p>
-          <p>✓ Admin email configured</p>
-          <p>✓ Production site URL configured before deployment</p>
+          <dl className="admin-detail-list">
+            <div>
+              <dt>BRAND</dt>
+              <dd>803 TAKEOVER</dd>
+            </div>
+
+            <div>
+              <dt>COLLECTION</dt>
+              <dd>LONG LIVE FELIX COLLECTIVE</dd>
+            </div>
+
+            <div>
+              <dt>CURRENCY</dt>
+              <dd>USD</dd>
+            </div>
+
+            <div>
+              <dt>PAYMENT PROVIDER</dt>
+              <dd>STRIPE CHECKOUT</dd>
+            </div>
+
+            <div>
+              <dt>DATABASE</dt>
+              <dd>SUPABASE POSTGRESQL + PRISMA</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <section className="admin-panel">
+        <div className="admin-panel-heading">
+          <div>
+            <span>SECURITY NOTICE</span>
+            <h2>ADMIN PROTECTION</h2>
+          </div>
+        </div>
+
+        <div className="admin-empty-mini">
+          Authentication is not installed yet. Do not deploy the admin dashboard
+          publicly until Module 3 adds protected routes and an admin login.
         </div>
       </section>
     </>

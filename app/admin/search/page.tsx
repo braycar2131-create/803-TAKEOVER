@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "../../../lib/prisma";
+import { formatMoney, shortOrderId } from "../../../lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +13,8 @@ type SearchPageProps = {
 export default async function AdminSearchPage({
   searchParams,
 }: SearchPageProps) {
-  const params = await searchParams;
-  const query = params.q?.trim() ?? "";
+  const { q } = await searchParams;
+  const query = q?.trim() ?? "";
 
   const [products, orders] = query
     ? await Promise.all([
@@ -38,25 +39,20 @@ export default async function AdminSearchPage({
                   mode: "insensitive",
                 },
               },
-              {
-                tag: {
-                  contains: query,
-                  mode: "insensitive",
-                },
-              },
             ],
           },
-
-          orderBy: {
-            createdAt: "desc",
-          },
-
-          take: 25,
+          take: 20,
         }),
 
         prisma.order.findMany({
           where: {
             OR: [
+              {
+                id: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
               {
                 customerEmail: {
                   contains: query,
@@ -69,20 +65,12 @@ export default async function AdminSearchPage({
                   mode: "insensitive",
                 },
               },
-              {
-                stripeSessionId: {
-                  contains: query,
-                  mode: "insensitive",
-                },
-              },
             ],
           },
-
+          take: 20,
           orderBy: {
             createdAt: "desc",
           },
-
-          take: 25,
         }),
       ])
     : [[], []];
@@ -91,148 +79,86 @@ export default async function AdminSearchPage({
     <>
       <section className="admin-page-heading">
         <div>
-          <span>GLOBAL ADMIN SEARCH</span>
+          <span>GLOBAL DATABASE SEARCH</span>
           <h1>SEARCH</h1>
-
-          <p>
-            Search products, orders, customer names, emails,
-            categories, collections, and Stripe sessions.
-          </p>
+          <p>Search products, customers, and orders.</p>
         </div>
       </section>
 
       <section className="admin-panel">
-        <form
-          method="GET"
-          style={{
-            display: "flex",
-            gap: "12px",
-          }}
-        >
-          <input
-            name="q"
-            defaultValue={query}
-            placeholder="SEARCH THE STORE"
-            autoFocus
-            style={{
-              minHeight: "54px",
-              flex: 1,
-              padding: "0 16px",
-              border: "1px solid var(--admin-border)",
-              background: "#050505",
-              color: "white",
-            }}
-          />
+        <form className="admin-search-form" action="/admin/search">
+          <label htmlFor="admin-global-search">SEARCH DATABASE</label>
 
-          <button
-            type="submit"
-            style={{
-              minHeight: "54px",
-              padding: "0 24px",
-              border: "1px solid var(--admin-red)",
-              background: "var(--admin-red)",
-              color: "white",
-              fontWeight: 900,
-            }}
-          >
-            SEARCH
-          </button>
+          <div>
+            <input
+              id="admin-global-search"
+              name="q"
+              type="search"
+              defaultValue={query}
+              placeholder="PRODUCT, ORDER ID, CUSTOMER OR EMAIL"
+              required
+            />
+
+            <button type="submit">SEARCH</button>
+          </div>
         </form>
       </section>
 
       {query ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "22px",
-            marginTop: "22px",
-          }}
-        >
+        <div className="admin-dashboard-grid">
           <section className="admin-panel">
-            <h2>PRODUCTS ({products.length})</h2>
-
-            {products.length === 0 ? (
-              <p style={{ color: "var(--admin-muted)" }}>
-                No products found.
-              </p>
-            ) : (
-              <div className="admin-table-wrap">
-                <table className="admin-table">
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product.id}>
-                        <td>
-                          <strong>{product.name}</strong>
-                          <small>{product.slug}</small>
-                        </td>
-
-                        <td>
-                          <Link
-                            className="admin-table-link"
-                            href={`/admin/products/${product.slug}`}
-                          >
-                            OPEN
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="admin-panel-heading">
+              <div>
+                <span>{products.length} RESULTS</span>
+                <h2>PRODUCTS</h2>
               </div>
-            )}
+            </div>
+
+            <div className="admin-search-results">
+              {products.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/admin/products/${product.slug}`}
+                >
+                  <div>
+                    <strong>{product.name}</strong>
+                    <span>{product.slug}</span>
+                  </div>
+
+                  <b>{formatMoney(product.priceCents)}</b>
+                </Link>
+              ))}
+            </div>
           </section>
 
           <section className="admin-panel">
-            <h2>ORDERS ({orders.length})</h2>
-
-            {orders.length === 0 ? (
-              <p style={{ color: "var(--admin-muted)" }}>
-                No orders found.
-              </p>
-            ) : (
-              <div className="admin-table-wrap">
-                <table className="admin-table">
-                  <tbody>
-                    {orders.map((order) => (
-                      <tr key={order.id}>
-                        <td>
-                          <strong>
-                            {order.customerName || "CUSTOMER"}
-                          </strong>
-
-                          <small>
-                            {order.customerEmail || order.id}
-                          </small>
-                        </td>
-
-                        <td>
-                          <Link
-                            className="admin-table-link"
-                            href={`/admin/orders/${order.id}`}
-                          >
-                            OPEN
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="admin-panel-heading">
+              <div>
+                <span>{orders.length} RESULTS</span>
+                <h2>ORDERS</h2>
               </div>
-            )}
+            </div>
+
+            <div className="admin-search-results">
+              {orders.map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/admin/orders/${order.id}`}
+                >
+                  <div>
+                    <strong>{shortOrderId(order.id)}</strong>
+                    <span>
+                      {order.customerEmail || "NO EMAIL"}
+                    </span>
+                  </div>
+
+                  <b>{formatMoney(order.amountTotal)}</b>
+                </Link>
+              ))}
+            </div>
           </section>
         </div>
-      ) : (
-        <section
-          className="admin-panel admin-empty-state"
-          style={{ marginTop: "22px" }}
-        >
-          <span>READY</span>
-          <h3>SEARCH YOUR STORE</h3>
-          <p>Enter a product, customer, email, or order reference.</p>
-        </section>
-      )}
+      ) : null}
     </>
   );
 }

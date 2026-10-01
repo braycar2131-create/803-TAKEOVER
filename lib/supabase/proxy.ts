@@ -1,54 +1,88 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+﻿import { createServerClient } from "@supabase/ssr";
+import {
+  NextResponse,
+  type NextRequest,
+} from "next/server";
 
-function getAdminEmail() {
-  return process.env.ADMIN_EMAIL
-    ?.trim()
-    .toLowerCase();
+function getSupabaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  if (!url) {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL is missing."
+    );
+  }
+
+  return url;
+}
+
+function getSupabasePublicKey(): string {
+  const key =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!key) {
+    throw new Error(
+      "Supabase public key is missing."
+    );
+  }
+
+  return key;
+}
+
+function copyResponseCookies(
+  source: NextResponse,
+  destination: NextResponse
+): NextResponse {
+  source.cookies.getAll().forEach((cookie) => {
+    destination.cookies.set(cookie);
+  });
+
+  return destination;
 }
 
 export async function updateSession(
   request: NextRequest
 ) {
-  let response = NextResponse.next({
+  let supabaseResponse = NextResponse.next({
     request,
   });
 
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return response;
-  }
-
   const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
+    getSupabaseUrl(),
+    getSupabasePublicKey(),
     {
       cookies: {
         getAll() {
           return request.cookies.getAll();
         },
 
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(
             ({ name, value }) => {
               request.cookies.set(name, value);
             }
           );
 
-          response = NextResponse.next({
+          supabaseResponse = NextResponse.next({
             request,
           });
 
           cookiesToSet.forEach(
             ({ name, value, options }) => {
-              response.cookies.set(
+              supabaseResponse.cookies.set(
                 name,
                 value,
                 options
+              );
+            }
+          );
+
+          Object.entries(headers).forEach(
+            ([key, value]) => {
+              supabaseResponse.headers.set(
+                key,
+                value
               );
             }
           );
@@ -57,51 +91,54 @@ export async function updateSession(
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error } =
+    await supabase.auth.getClaims();
+
+  const emailClaim = data?.claims?.email;
+
+  const signedInEmail =
+    typeof emailClaim === "string"
+      ? emailClaim.trim().toLowerCase()
+      : "";
+
+  const adminEmail =
+    process.env.ADMIN_EMAIL
+      ?.trim()
+      .toLowerCase() ?? "";
+
+  const isAdmin =
+    !error &&
+    adminEmail.length > 0 &&
+    signedInEmail === adminEmail;
 
   const pathname = request.nextUrl.pathname;
-  const isAdminRoute =
-    pathname === "/admin" ||
-    pathname.startsWith("/admin/");
-  const isLoginRoute = pathname === "/login";
 
-  const adminEmail = getAdminEmail();
-  const userEmail = user?.email
-    ?.trim()
-    .toLowerCase();
-
-  const isAuthorizedAdmin =
-    Boolean(user) &&
-    Boolean(adminEmail) &&
-    userEmail === adminEmail;
-
-  if (isAdminRoute && !isAuthorizedAdmin) {
+  if (
+    pathname.startsWith("/admin") &&
+    !isAdmin
+  ) {
     const loginUrl = request.nextUrl.clone();
+
     loginUrl.pathname = "/login";
-    loginUrl.searchParams.set(
-      "next",
-      pathname
+    loginUrl.search = "";
+
+    return copyResponseCookies(
+      supabaseResponse,
+      NextResponse.redirect(loginUrl)
     );
-
-    if (user && !isAuthorizedAdmin) {
-      loginUrl.searchParams.set(
-        "error",
-        "unauthorized"
-      );
-    }
-
-    return NextResponse.redirect(loginUrl);
   }
 
-  if (isLoginRoute && isAuthorizedAdmin) {
+  if (pathname === "/login" && isAdmin) {
     const adminUrl = request.nextUrl.clone();
+
     adminUrl.pathname = "/admin";
     adminUrl.search = "";
 
-    return NextResponse.redirect(adminUrl);
+    return copyResponseCookies(
+      supabaseResponse,
+      NextResponse.redirect(adminUrl)
+    );
   }
 
-  return response;
+  return supabaseResponse;
 }

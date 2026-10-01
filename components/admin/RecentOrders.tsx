@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { Order, OrderItem } from "../../app/generated/prisma/client";
 import OrdersTable from "./OrdersTable";
 
@@ -18,7 +20,7 @@ export default function RecentOrders({
           <h2>RECENT ORDERS</h2>
         </div>
 
-        <a href="/admin/orders">VIEW ALL</a>
+        <Link href="/admin/orders">VIEW ALL</Link>
       </div>
 
       <OrdersTable orders={orders} compact />

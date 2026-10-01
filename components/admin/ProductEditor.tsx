@@ -98,7 +98,7 @@ export default function ProductEditor({
               <input
                 name="tag"
                 defaultValue={product?.tag}
-                placeholder="DROP 001"
+                placeholder="LONG LIVE FELIX COLLECTIVE"
                 required
               />
             </label>
@@ -143,6 +143,7 @@ export default function ProductEditor({
                 name="images"
                 defaultValue={imageValue}
                 rows={6}
+                placeholder="/products/front.png&#10;/products/back.png"
               />
             </label>
           </section>

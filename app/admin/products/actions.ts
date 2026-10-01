@@ -154,8 +154,9 @@ export async function updateProductAction(
 
 export async function deleteProductAction(
   slug: string,
-  _formData: FormData
+  formData: FormData
 ) {
+  void formData;
   await prisma.product.delete({
     where: { slug },
   });
